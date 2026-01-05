@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NetroX VPN | Check Usage</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --primary: #00f2fe; --dark: #080c14; --glass: rgba(255, 255, 255, 0.08); --border: rgba(255, 255, 255, 0.1); }
+        body { background: var(--dark); color: white; font-family: 'Poppins', sans-serif; margin: 0; text-align: center; }
+        .container { max-width: 500px; margin: auto; padding: 20px; }
+        .card { background: var(--glass); border: 1px solid var(--border); border-radius: 20px; padding: 25px; margin-top: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
+        input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: #111; color: white; box-sizing: border-box; margin-bottom: 15px; text-align: center; }
+        .btn { background: var(--primary); color: #000; width: 100%; padding: 15px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn:hover { opacity: 0.8; transform: scale(1.02); }
+        
+        .result-box { display: none; margin-top: 25px; text-align: left; animation: fadeIn 0.5s; }
+        .u-item { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+        .progress-bg { background: #333; height: 12px; border-radius: 10px; margin: 20px 0; overflow: hidden; }
+        .progress-bar { background: var(--primary); height: 100%; width: 0%; transition: 1.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header style="padding-top:40px;">
+        <img src="logo.png" style="width:70px; border-radius:50%; border:2px solid var(--primary); padding: 5px;">
+        <h2 style="letter-spacing: 1px;">NetroX VPN</h2>
+    </header>
+
+    <div class="card">
+        <h3 style="margin-top:0;">📊 Usage Checker</h3>
+        <p style="font-size: 0.8rem; opacity: 0.7;">ඔබේ Username (Remark) එක ඇතුළත් කරන්න.</p>
+        <input type="text" id="userInput" placeholder="e.g. kalpika">
+        <button class="btn" onclick="fetchUsage()">Check Status</button>
+
+        <div id="loader" style="display:none; margin-top:20px;"><i class="fas fa-spinner fa-spin"></i> Loading Data...</div>
+
+        <div id="usageInfo" class="result-box">
+            <div class="u-item"><span><i class="fas fa-user"></i> Name:</span> <b id="rName"></b></div>
+            <div class="u-item"><span><i class="fas fa-clock"></i> Expiry:</span> <b id="rExpire"></b></div>
+            <div class="u-item"><span><i class="fas fa-download"></i> Used:</span> <b id="rUsed"></b></div>
+            <div class="u-item"><span><i class="fas fa-hdd"></i> Total:</span> <b id="rTotal"></b></div>
+            
+            <div class="progress-bg"><div id="rBar" class="progress-bar"></div></div>
+            <div class="u-item" style="border:none;"><span>Remaining Data:</span> <b id="rRemain" style="color:var(--primary);"></b></div>
+        </div>
+    </div>
+    
+    <p style="font-size: 10px; color: gray; margin-top: 30px;">© 2026 NetroX VPN | Powered by Smart Web</p>
+</div>
+
+<script>
+async function fetchUsage() {
+    const user = document.getElementById('userInput').value.trim();
+    if(!user) return alert("Username එක ඇතුළත් කරන්න!");
+
+    document.getElementById('loader').style.display = 'block';
+    document.getElementById('usageInfo').style.display = 'none';
+
+    try {
+        const response = await fetch(`check.php?email=${encodeURIComponent(user)}`);
+        const data = await response.json();
+
+        if(data.success && data.obj) {
+            const client = data.obj;
+            const used = (client.up + client.down) / (1024 ** 3);
+            const total = client.total / (1024 ** 3);
+            
+            document.getElementById('rName').innerText = client.email;
+            document.getElementById('rUsed').innerText = used.toFixed(2) + " GB";
+            document.getElementById('rTotal').innerText = total > 0 ? total.toFixed(2) + " GB" : "Unlimited";
+            
+            if(client.expiryTime > 0) {
+                document.getElementById('rExpire').innerText = new Date(client.expiryTime).toLocaleDateString();
+            } else {
+                document.getElementById('rExpire').innerText = "No Expiry";
+            }
+
+            if(total > 0) {
+                const p = Math.min((used / total) * 100, 100);
+                document.getElementById('rBar').style.width = p + "%";
+                document.getElementById('rRemain').innerText = (total - used).toFixed(2) + " GB";
+            } else {
+                document.getElementById('rBar').style.width = "0%";
+                document.getElementById('rRemain').innerText = "Unlimited";
+            }
+
+            document.getElementById('usageInfo').style.display = 'block';
+        } else {
+            alert("User හමු නොවීය! නම නිවැරදිදැයි බලන්න.");
+        }
+    } catch(e) {
+        alert("Server එකට සම්බන්ධ වීමට නොහැකි විය!");
+    } finally {
+        document.getElementById('loader').style.display = 'none';
+    }
+}
+</script>
+</body>
+</html>      </div>
+            </div>
+        </div>
+
+        <div id="downloads" class="page-section">
+            <div class="card">
+                <h3>📥 Official Apps</h3>
+                <p>NetroX VPN භාවිතා කිරීමට අවශ්‍ය Apps පහතින් බාගත කරගන්න.</p>
+                <a href="#" class="btn-main" style="display:block; text-decoration:none; text-align:center; margin-bottom: 10px;">Download Android App</a>
+                <a href="#" class="btn-main" style="display:block; text-decoration:none; text-align:center; background: #555; color: white;">Download iOS App</a>
+            </div>
+        </div>
+
+        <div class="footer-text">© 2026 NetroX VPN | Smart Web Technology</div>
+    </div>
+
+    <script>
+        // Sidebar functions
+        function openNav() { document.getElementById("mySidebar").style.width = "260px"; }
+        function closeNav() { document.getElementById("mySidebar").style.width = "0"; }
+
+        // Page navigation
+        function showPage(p) { 
+            let s = document.getElementsByClassName("page-section");
+            for(let i=0; i<s.length; i++) s[i].classList.remove("active");
+            document.getElementById(p).classList.add("active");
+            closeNav();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Usage function using Iframe
+        function showUsageInSite() {
+            const url = document.getElementById('subURL').value.trim();
+            const displayBox = document.getElementById('usageDisplay');
+            const iframe = document.getElementById('usageFrame');
+
+            if(url.startsWith("http")) {
+                // Iframe එකට ලින්ක් එක ලබා දී එය පෙන්වීම
+                iframe.src = url;
+                displayBox.style.display = 'block';
+                
+                // පහසුව සඳහා Iframe එක දෙසට scroll කිරීම
+                setTimeout(() => {
+                    displayBox.scrollIntoView({ behavior: 'smooth' });
+                }, 200);
+            } else {
+                alert("කරුණාකර නිවැරදි Subscription Link එක ඇතුළත් කරන්න!");
+            }
+        }
+    </script>
+</body>
+</html>                document.getElementById('uBar').style.width = "0%";
+                    }
+                    document.getElementById('usageBox').style.display = 'block';
+                } else {
+                    alert("User not found!");
+                }
+            } catch (e) {
+                alert("Error connecting to server.");
+            } finally {
+                document.getElementById('loader').style.display = 'none';
+            }
+        }
+async function getUsage() {
+    const emailInput = document.getElementById('clientEmail').value.trim();
+    if(!emailInput) return alert("කරුණාකර Username එක ඇතුළත් කරන්න");
+
+    const loader = document.getElementById('loader');
+    const usageBox = document.getElementById('usageBox');
+    
+    loader.style.display = 'block';
+    usageBox.style.display = 'none';
+
+    try {
+        // ලෝකල් ෆයිල් එකක් ලෙස නොව URL එකක් ලෙස කැඳවීම
+        const response = await fetch(`check.php?email=${encodeURIComponent(emailInput)}`, {
+            method: 'GET',
+            cache: 'no-cache'
+        });
+
+        if (!response.ok) throw new Error('Server response error');
+
+        const data = await response.json();
+
+        if(data.success && data.obj) {
+            const client = data.obj;
+            const up = client.up || 0;
+            const down = client.down || 0;
+            const totalLimit = client.total || 0;
+            
+            const used = (up + down) / (1024 ** 3);
+            const total = totalLimit / (1024 ** 3);
+            const remaining = total - used;
+
+            document.getElementById('uUsed').innerText = used.toFixed(2) + " GB";
+            document.getElementById('uTotal').innerText = total > 0 ? total.toFixed(2) + " GB" : "Unlimited";
+            
+            if(total > 0) {
+                const percent = Math.min((used / total) * 100, 100);
+                document.getElementById('uRemaining').innerText = Math.max(remaining, 0).toFixed(2) + " GB";
+                document.getElementById('uBar').style.width = percent + "%";
+                document.getElementById('uPercent').innerText = percent.toFixed(1) + "% Used";
+            } else {
+                document.getElementById('uRemaining').innerText = "Unlimited";
+                document.getElementById('uBar').style.width = "0%";
+            }
+            usageBox.style.display = 'block';
+        } else {
+            alert("මෙම නමින් User කෙනෙකු හමු නොවීය!");
+        }
+    } catch (e) {
+        console.error(e);
+        alert("දත්ත ලබා ගැනීමට නොහැකි විය. (Check.php ගොනුව පරීක්ෂා කරන්න)");
+    } finally {
+        loader.style.display = 'none';
+    }
+}
+    </script>
+</body>
+</html>
