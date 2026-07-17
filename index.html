@@ -1,222 +1,333 @@
 <!DOCTYPE html>
-<html lang="si">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NetroX VPN | Check Usage</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>NetroX VPN – Client Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="https://i.ibb.co/Kj3NdKvH/Whats-App-Image-2026-04-21-at-7-52-57-PM-1.jpg" type="image/jpeg">
+
     <style>
-        :root { --primary: #00f2fe; --dark: #080c14; --glass: rgba(255, 255, 255, 0.08); --border: rgba(255, 255, 255, 0.1); }
-        body { background: var(--dark); color: white; font-family: 'Poppins', sans-serif; margin: 0; text-align: center; }
-        .container { max-width: 500px; margin: auto; padding: 20px; }
-        .card { background: var(--glass); border: 1px solid var(--border); border-radius: 20px; padding: 25px; margin-top: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
-        input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: #111; color: white; box-sizing: border-box; margin-bottom: 15px; text-align: center; }
-        .btn { background: var(--primary); color: #000; width: 100%; padding: 15px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .btn:hover { opacity: 0.8; transform: scale(1.02); }
+        :root {
+            --cyan:#00d2ff; --blue:#3a7bd5; --gold:#ffd700; --orange:#ff8c00;
+            --green:#34c759; --red:#ff3b30; --bg:#050510;
+            --card:rgba(255,255,255,0.02); --border:rgba(255,255,255,0.04);
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Inter',sans-serif; background:var(--bg); color:#fff; min-height:100vh; overflow-x:hidden; }
+
+        .mesh-bg {
+            position:fixed; top:0; left:0; width:100%; height:100%; z-index:-2;
+            background:
+                radial-gradient(ellipse at 20% 50%, rgba(0,210,255,0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(58,123,213,0.05) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 80%, rgba(255,215,0,0.03) 0%, transparent 50%);
+        }
+
+        #particles-js { position:fixed; top:0; left:0; width:100%; height:100%; z-index:-1; }
+
+        nav {
+            position:fixed; top:0; width:100%; padding:12px 5%; display:flex;
+            justify-content:space-between; align-items:center;
+            background:rgba(5,5,16,0.9); backdrop-filter:blur(25px);
+            border-bottom:1px solid var(--border); z-index:1000;
+        }
+
+        .nav-logo { font-size:20px; font-weight:800; color:var(--cyan); text-transform:uppercase; letter-spacing:3px; text-decoration:none; display:flex; align-items:center; gap:12px; }
+        .nav-logo img { width:42px; height:42px; object-fit:cover; border-radius:12px; border:1px solid rgba(255,255,255,0.1); }
+
+        .page-wrapper { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:100px 15px 50px; }
+        .main-container { width:100%; max-width:520px; }
+
+        .login-card { background:var(--card); border:1px solid var(--border); border-radius:22px; padding:35px 28px; backdrop-filter:blur(10px); position:relative; overflow:hidden; }
+        .login-card::before { content:''; position:absolute; top:0; left:0; width:100%; height:3px; background:linear-gradient(to right, var(--cyan), var(--blue)); }
+
+        .form-group { margin-bottom:20px; }
+        .form-group label { display:block; margin-bottom:8px; font-size:0.75rem; color:#666; text-transform:uppercase; letter-spacing:1px; }
+        .input-wrapper { position:relative; }
+        .input-wrapper i { position:absolute; left:16px; top:50%; transform:translateY(-50%); color:#444; }
+        .input-wrapper input { width:100%; padding:14px 16px 14px 46px; background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:12px; color:#fff; outline:none; }
+
+        .login-btn { width:100%; padding:15px; border:none; border-radius:14px; font-weight:700; cursor:pointer; transition:0.4s; display:flex; align-items:center; justify-content:center; gap:10px; text-transform:uppercase; background:linear-gradient(135deg, var(--cyan), var(--blue)); color:#000; }
         
-        .result-box { display: none; margin-top: 25px; text-align: left; animation: fadeIn 0.5s; }
-        .u-item { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
-        .progress-bg { background: #333; height: 12px; border-radius: 10px; margin: 20px 0; overflow: hidden; }
-        .progress-bar { background: var(--primary); height: 100%; width: 0%; transition: 1.5s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .status-msg { padding:12px; border-radius:10px; margin-bottom:15px; font-size:0.8rem; text-align:center; display:none; }
+        .status-msg.error { display:block; background:rgba(255,59,48,0.1); color:#ff6b6b; border:1px solid rgba(255,59,48,0.2); }
+
+        .dashboard { display:none; }
+        .dashboard.active { display:block; }
+        
+        .vpn-card { 
+            background:var(--card); border:1px solid var(--border); border-radius:18px; padding:20px; margin-bottom:12px; 
+            cursor:pointer; transition:0.3s; display:flex; justify-content:space-between; align-items:center;
+        }
+        .vpn-card:hover { border-color:var(--cyan); background:rgba(0,210,255,0.05); transform: translateY(-2px); }
+        .vpn-card-info h4 { color:var(--cyan); font-size:1rem; margin-bottom:4px; }
+        .vpn-card-info p { font-size:0.75rem; color:#666; }
+
+        .welcome-banner { background:linear-gradient(135deg, rgba(0,210,255,0.06), rgba(58,123,213,0.04)); border:1px solid rgba(0,210,255,0.08); border-radius:22px; padding:25px; margin-bottom:20px; display:flex; align-items:center; gap:18px; }
+        .w-avatar { width:65px; height:65px; border-radius:18px; background:linear-gradient(135deg, var(--cyan), var(--blue)); display:flex; align-items:center; justify-content:center; font-size:24px; font-weight:800; color:#000; }
+        
+        .quick-stats { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:18px; }
+        .q-stat { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:16px 8px; text-align:center; }
+        .q-label { font-size:0.55rem; color:#555; text-transform:uppercase; margin-bottom:3px; }
+        .q-value { font-size:0.82rem; font-weight:700; font-family:'JetBrains Mono',monospace; }
+
+        .gauge-section { background:var(--card); border:1px solid var(--border); border-radius:22px; padding:28px 22px; margin-bottom:18px; text-align:center; position:relative; }
+        .gauge-container { position:relative; width:150px; height:150px; margin:0 auto 15px; }
+        .gauge-svg { transform:rotate(-90deg); width:100%; height:100%; }
+        .gauge-svg circle { fill:none; stroke-width:10; stroke-linecap:round; }
+        .gauge-svg .track { stroke:rgba(255,255,255,0.02); }
+        .gauge-svg .fill { stroke:var(--cyan); stroke-dasharray:440; stroke-dashoffset:440; transition: 1s; }
+        .gauge-center { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); }
+        .g-percent { font-size:2rem; font-weight:900; color:var(--cyan); }
+
+        .config-area { background:rgba(0,0,0,0.3); border:1px dashed #333; border-radius:12px; padding:15px; font-size:0.7rem; font-family:'JetBrains Mono'; word-break:break-all; margin-bottom:15px; max-height: 80px; overflow-y: auto; }
+
+        .action-btn { width:100%; padding:15px; border-radius:14px; font-weight:700; border:none; cursor:pointer; margin-bottom:10px; text-transform:uppercase; }
+        .btn-back { background:rgba(255,255,255,0.05); color:#fff; }
+        .btn-copy { background:var(--cyan); color:#000; }
+        .btn-logout { background:rgba(255,59,48,0.1); color:#ff6b6b; }
+
+        .spinner { width:20px; height:20px; border:3px solid rgba(0,0,0,0.1); border-top-color:#000; border-radius:50%; animation:rotate 1s linear infinite; display:none; margin-left:10px; }
+        @keyframes rotate { to{transform:rotate(360deg)} }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <header style="padding-top:40px;">
-        <img src="logo.png" style="width:70px; border-radius:50%; border:2px solid var(--primary); padding: 5px;">
-        <h2 style="letter-spacing: 1px;">NetroX VPN</h2>
-    </header>
+    <div class="mesh-bg"></div>
+    <div id="particles-js"></div>
 
-    <div class="card">
-        <h3 style="margin-top:0;">📊 Usage Checker</h3>
-        <p style="font-size: 0.8rem; opacity: 0.7;">ඔබේ Username (Remark) එක ඇතුළත් කරන්න.</p>
-        <input type="text" id="userInput" placeholder="e.g. kalpika">
-        <button class="btn" onclick="fetchUsage()">Check Status</button>
+    <nav>
+        <a href="#" class="nav-logo">
+            <img src="https://i.ibb.co/Kj3NdKvH/Whats-App-Image-2026-04-21-at-7-52-57-PM-1.jpg" alt="Logo">
+            <span>NetroX VPN</span>
+        </a>
+    </nav>
 
-        <div id="loader" style="display:none; margin-top:20px;"><i class="fas fa-spinner fa-spin"></i> Loading Data...</div>
+    <div class="page-wrapper">
+        <div class="main-container">
 
-        <div id="usageInfo" class="result-box">
-            <div class="u-item"><span><i class="fas fa-user"></i> Name:</span> <b id="rName"></b></div>
-            <div class="u-item"><span><i class="fas fa-clock"></i> Expiry:</span> <b id="rExpire"></b></div>
-            <div class="u-item"><span><i class="fas fa-download"></i> Used:</span> <b id="rUsed"></b></div>
-            <div class="u-item"><span><i class="fas fa-hdd"></i> Total:</span> <b id="rTotal"></b></div>
-            
-            <div class="progress-bg"><div id="rBar" class="progress-bar"></div></div>
-            <div class="u-item" style="border:none;"><span>Remaining Data:</span> <b id="rRemain" style="color:var(--primary);"></b></div>
-        </div>
-    </div>
-    
-    <p style="font-size: 10px; color: gray; margin-top: 30px;">© 2026 NetroX VPN | Powered by Smart Web</p>
-</div>
+            <!-- LOGIN -->
+            <div id="loginArea">
+                <div class="login-card">
+                    <h2 style="margin-bottom:5px;">NetroX Login</h2>
+                    <p style="font-size:0.85rem; color:#555; margin-bottom:25px;">Enter username and password to access services.</p>
+                    <div id="loginError" class="status-msg error"></div>
+                    
+                    <form onsubmit="handleClientLogin(event)">
+                        <div class="form-group">
+                            <label>Username</label>
+                            <div class="input-wrapper"><i class="fas fa-user"></i><input type="text" id="loginUsername" placeholder="Enter username" required></div>
+                        </div>
+                        <div class="form-group">
+                            <label>Password</label>
+                            <div class="input-wrapper"><i class="fas fa-lock"></i><input type="password" id="loginPassword" placeholder="••••••••" required></div>
+                        </div>
+                        <button type="submit" class="login-btn" id="loginBtn">Sign In <div class="spinner"></div></button>
+                    </form>
+                </div>
+            </div>
 
-<script>
-async function fetchUsage() {
-    const user = document.getElementById('userInput').value.trim();
-    if(!user) return alert("Username එක ඇතුළත් කරන්න!");
+            <!-- DASHBOARD -->
+            <div id="dashboard" class="dashboard">
+                <div class="welcome-banner">
+                    <div class="w-avatar" id="avatarChar">U</div>
+                    <div class="w-info">
+                        <div style="font-size:0.6rem; color:#555; text-transform:uppercase;">CORE DASHBOARD</div>
+                        <h2 id="clientFullName">NETROX USER</h2>
+                        <p id="clientDisplayUser" style="font-size:0.75rem; color:var(--cyan);">@username</p>
+                    </div>
+                </div>
 
-    document.getElementById('loader').style.display = 'block';
-    document.getElementById('usageInfo').style.display = 'none';
+                <!-- Product Selection -->
+                <div id="productListArea">
+                    <h3 style="font-size:0.9rem; margin-bottom:15px; color:#777; text-transform:uppercase;">Your Subscriptions</h3>
+                    <div id="vpnCardsContainer">
+                        <!-- Cards will be injected here -->
+                    </div>
+                </div>
 
-    try {
-        const response = await fetch(`check.php?email=${encodeURIComponent(user)}`);
-        const data = await response.json();
+                <!-- Usage Details (Initially Hidden) -->
+                <div id="usageDetailArea" style="display:none;">
+                    <button class="action-btn btn-back" onclick="backToProductList()"><i class="fas fa-arrow-left"></i> Back to Products</button>
+                    
+                    <div class="quick-stats">
+                        <div class="q-stat"><div class="q-label">Used</div><div class="q-value" id="qUsed" style="color:var(--cyan);">--</div></div>
+                        <div class="q-stat"><div class="q-label">Limit</div><div class="q-value" id="qLimit" style="color:var(--gold);">--</div></div>
+                        <div class="q-stat"><div class="q-label">Expiry</div><div class="q-value" id="qDays" style="color:var(--green);">--</div></div>
+                    </div>
 
-        if(data.success && data.obj) {
-            const client = data.obj;
-            const used = (client.up + client.down) / (1024 ** 3);
-            const total = client.total / (1024 ** 3);
-            
-            document.getElementById('rName').innerText = client.email;
-            document.getElementById('rUsed').innerText = used.toFixed(2) + " GB";
-            document.getElementById('rTotal').innerText = total > 0 ? total.toFixed(2) + " GB" : "Unlimited";
-            
-            if(client.expiryTime > 0) {
-                document.getElementById('rExpire').innerText = new Date(client.expiryTime).toLocaleDateString();
-            } else {
-                document.getElementById('rExpire').innerText = "No Expiry";
-            }
+                    <div class="gauge-section">
+                        <div class="gauge-container">
+                            <svg class="gauge-svg" viewBox="0 0 150 150">
+                                <circle class="track" cx="75" cy="75" r="70"/>
+                                <circle class="fill" id="gaugeFill" cx="75" cy="75" r="70"/>
+                            </svg>
+                            <div class="gauge-center"><div class="g-percent" id="gPercent">0%</div></div>
+                        </div>
+                        <p style="font-size:0.7rem; color:#555; text-transform:uppercase;" id="selectedVpnLabel">Package Usage</p>
+                    </div>
 
-            if(total > 0) {
-                const p = Math.min((used / total) * 100, 100);
-                document.getElementById('rBar').style.width = p + "%";
-                document.getElementById('rRemain').innerText = (total - used).toFixed(2) + " GB";
-            } else {
-                document.getElementById('rBar').style.width = "0%";
-                document.getElementById('rRemain').innerText = "Unlimited";
-            }
+                    <div class="form-group">
+                        <label>V2Ray Configuration</label>
+                        <div id="configDisplay" class="config-area">...</div>
+                        <button class="action-btn btn-copy" onclick="copyConfig()"><i class="fas fa-copy"></i> Copy Config</button>
+                    </div>
+                </div>
 
-            document.getElementById('usageInfo').style.display = 'block';
-        } else {
-            alert("User හමු නොවීය! නම නිවැරදිදැයි බලන්න.");
-        }
-    } catch(e) {
-        alert("Server එකට සම්බන්ධ වීමට නොහැකි විය!");
-    } finally {
-        document.getElementById('loader').style.display = 'none';
-    }
-}
-</script>
-</body>
-</html>      </div>
+                <button class="action-btn btn-logout" style="margin-top:20px;" onclick="location.reload()">Sign Out</button>
             </div>
         </div>
-
-        <div id="downloads" class="page-section">
-            <div class="card">
-                <h3>📥 Official Apps</h3>
-                <p>NetroX VPN භාවිතා කිරීමට අවශ්‍ය Apps පහතින් බාගත කරගන්න.</p>
-                <a href="#" class="btn-main" style="display:block; text-decoration:none; text-align:center; margin-bottom: 10px;">Download Android App</a>
-                <a href="#" class="btn-main" style="display:block; text-decoration:none; text-align:center; background: #555; color: white;">Download iOS App</a>
-            </div>
-        </div>
-
-        <div class="footer-text">© 2026 NetroX VPN | Smart Web Technology</div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
 
     <script>
-        // Sidebar functions
-        function openNav() { document.getElementById("mySidebar").style.width = "260px"; }
-        function closeNav() { document.getElementById("mySidebar").style.width = "0"; }
+        // --- ඔබේ Worker URL එක මෙතනට දාන්න ---
+        const workerUrl = "https://soft-water-567c.kalpikachampathi.workers.dev"; 
 
-        // Page navigation
-        function showPage(p) { 
-            let s = document.getElementsByClassName("page-section");
-            for(let i=0; i<s.length; i++) s[i].classList.remove("active");
-            document.getElementById(p).classList.add("active");
-            closeNav();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+        let loggedUser = null;
 
-        // Usage function using Iframe
-        function showUsageInSite() {
-            const url = document.getElementById('subURL').value.trim();
-            const displayBox = document.getElementById('usageDisplay');
-            const iframe = document.getElementById('usageFrame');
+        async function handleClientLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            const btn = document.getElementById('loginBtn');
+            const errorMsg = document.getElementById('loginError');
 
-            if(url.startsWith("http")) {
-                // Iframe එකට ලින්ක් එක ලබා දී එය පෙන්වීම
-                iframe.src = url;
-                displayBox.style.display = 'block';
-                
-                // පහසුව සඳහා Iframe එක දෙසට scroll කිරීම
-                setTimeout(() => {
-                    displayBox.scrollIntoView({ behavior: 'smooth' });
-                }, 200);
-            } else {
-                alert("කරුණාකර නිවැරදි Subscription Link එක ඇතුළත් කරන්න!");
-            }
-        }
-    </script>
-</body>
-</html>                document.getElementById('uBar').style.width = "0%";
-                    }
-                    document.getElementById('usageBox').style.display = 'block';
+            btn.disabled = true; btn.querySelector('.spinner').style.display = 'block';
+            errorMsg.style.display = 'none';
+
+            try {
+                const response = await fetch(`${workerUrl}/login`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    loggedUser = result.user;
+                    showDashboard();
                 } else {
-                    alert("User not found!");
+                    throw new Error(result.message);
                 }
-            } catch (e) {
-                alert("Error connecting to server.");
+            } catch (err) {
+                errorMsg.textContent = "Login Failed: Check credentials";
+                errorMsg.style.display = 'block';
             } finally {
-                document.getElementById('loader').style.display = 'none';
+                btn.disabled = false; btn.querySelector('.spinner').style.display = 'none';
             }
         }
-async function getUsage() {
-    const emailInput = document.getElementById('clientEmail').value.trim();
-    if(!emailInput) return alert("කරුණාකර Username එක ඇතුළත් කරන්න");
 
-    const loader = document.getElementById('loader');
-    const usageBox = document.getElementById('usageBox');
-    
-    loader.style.display = 'block';
-    usageBox.style.display = 'none';
+        async function showDashboard() {
+            document.getElementById('loginArea').style.display = 'none';
+            document.getElementById('dashboard').classList.add('active');
+            
+            document.getElementById('clientFullName').textContent = loggedUser.full_name;
+            document.getElementById('clientDisplayUser').textContent = "@" + loggedUser.username;
+            document.getElementById('avatarChar').textContent = loggedUser.full_name.charAt(0).toUpperCase();
 
-    try {
-        // ලෝකල් ෆයිල් එකක් ලෙස නොව URL එකක් ලෙස කැඳවීම
-        const response = await fetch(`check.php?email=${encodeURIComponent(emailInput)}`, {
-            method: 'GET',
-            cache: 'no-cache'
+            loadUserProducts();
+        }
+
+        async function loadUserProducts() {
+            const container = document.getElementById('vpnCardsContainer');
+            container.innerHTML = '<p style="text-align:center; font-size:0.8rem; color:#444;">Fetching products...</p>';
+
+            try {
+                const response = await fetch(`${workerUrl}/get-vpns?username=${loggedUser.username}`);
+                const vpns = await response.json();
+
+                if (vpns.length === 0) {
+                    container.innerHTML = '<p style="text-align:center; font-size:0.8rem; color:#888;">No active subscriptions found.</p>';
+                    return;
+                }
+
+                container.innerHTML = "";
+                vpns.forEach(vpn => {
+                    const card = document.createElement('div');
+                    card.className = 'vpn-card';
+                    card.onclick = () => viewUsage(vpn);
+                    card.innerHTML = `
+                        <div class="vpn-card-info">
+                            <h4>${vpn.label}</h4>
+                            <p><i class="fas fa-id-badge"></i> ${vpn.vpn_email}</p>
+                        </div>
+                        <i class="fas fa-chevron-right" style="color:#333;"></i>
+                    `;
+                    container.appendChild(card);
+                });
+
+            } catch (err) {
+                container.innerHTML = '<p style="color:red; font-size:0.8rem;">Failed to load products.</p>';
+            }
+        }
+
+        async function viewUsage(vpn) {
+            document.getElementById('productListArea').style.display = 'none';
+            document.getElementById('usageDetailArea').style.display = 'block';
+            document.getElementById('selectedVpnLabel').textContent = vpn.label;
+            document.getElementById('configDisplay').textContent = vpn.vpn_config;
+
+            // Usage Fetching
+            try {
+                const response = await fetch(`${workerUrl}/get-usage?vpn_email=${vpn.vpn_email}`);
+                const data = await response.json();
+
+                if (data) {
+                    const used = data.up + data.down;
+                    const limit = data.total;
+                    
+                    document.getElementById('qUsed').textContent = formatBytes(used);
+                    document.getElementById('qLimit').textContent = limit > 0 ? formatBytes(limit) : "∞";
+
+                    if (limit > 0) {
+                        const pct = Math.floor(Math.min((used / limit) * 100, 100));
+                        document.getElementById('gPercent').textContent = pct + "%";
+                        document.getElementById('gaugeFill').style.strokeDashoffset = 440 - (pct / 100) * 440;
+                    } else {
+                        document.getElementById('gPercent').textContent = "∞";
+                        document.getElementById('gaugeFill').style.strokeDashoffset = "0";
+                    }
+
+                    if (data.expiryTime > 0) {
+                        const date = new Date(data.expiryTime);
+                        document.getElementById('qDays').textContent = date.toLocaleDateString();
+                    } else {
+                        document.getElementById('qDays').textContent = "Lifetime";
+                    }
+                }
+            } catch (err) {
+                console.error("Usage fetch failed");
+            }
+        }
+
+        function backToProductList() {
+            document.getElementById('productListArea').style.display = 'block';
+            document.getElementById('usageDetailArea').style.display = 'none';
+        }
+
+        function formatBytes(b) {
+            if (b === 0) return '0 B';
+            const k = 1024, sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+            const i = Math.floor(Math.log(b) / Math.log(k));
+            return parseFloat((b / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function copyConfig() {
+            const config = document.getElementById('configDisplay').textContent;
+            navigator.clipboard.writeText(config).then(() => {
+                alert("Config copied!");
+            });
+        }
+
+        particlesJS('particles-js', {
+            particles: { number: { value: 40 }, color: { value: '#00d2ff' }, opacity: { value: 0.1 }, size: { value: 2 }, line_linked: { enable: true, distance: 150, color: '#00d2ff', opacity: 0.05 }, move: { speed: 1 } }
         });
-
-        if (!response.ok) throw new Error('Server response error');
-
-        const data = await response.json();
-
-        if(data.success && data.obj) {
-            const client = data.obj;
-            const up = client.up || 0;
-            const down = client.down || 0;
-            const totalLimit = client.total || 0;
-            
-            const used = (up + down) / (1024 ** 3);
-            const total = totalLimit / (1024 ** 3);
-            const remaining = total - used;
-
-            document.getElementById('uUsed').innerText = used.toFixed(2) + " GB";
-            document.getElementById('uTotal').innerText = total > 0 ? total.toFixed(2) + " GB" : "Unlimited";
-            
-            if(total > 0) {
-                const percent = Math.min((used / total) * 100, 100);
-                document.getElementById('uRemaining').innerText = Math.max(remaining, 0).toFixed(2) + " GB";
-                document.getElementById('uBar').style.width = percent + "%";
-                document.getElementById('uPercent').innerText = percent.toFixed(1) + "% Used";
-            } else {
-                document.getElementById('uRemaining').innerText = "Unlimited";
-                document.getElementById('uBar').style.width = "0%";
-            }
-            usageBox.style.display = 'block';
-        } else {
-            alert("මෙම නමින් User කෙනෙකු හමු නොවීය!");
-        }
-    } catch (e) {
-        console.error(e);
-        alert("දත්ත ලබා ගැනීමට නොහැකි විය. (Check.php ගොනුව පරීක්ෂා කරන්න)");
-    } finally {
-        loader.style.display = 'none';
-    }
-}
     </script>
 </body>
 </html>
